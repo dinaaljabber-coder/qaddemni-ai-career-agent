@@ -1,0 +1,22 @@
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight, Coins, CreditCard, History } from "lucide-react";
+import { CREDIT_COSTS, CREDIT_LABELS, type CreditAction } from "@/lib/credits";
+import { useCredits } from "@/components/credit-provider";
+import { CareerEmptyIllustration } from "@/components/career-visuals";
+import { useLocale } from "@/lib/use-locale";
+
+const packages = [{ name: "Starter", credits: 50, price: "$1" }, { name: "Momentum", credits: 250, price: "$5" }, { name: "Focused", credits: 500, price: "$10" }, { name: "Career year", credits: 1000, price: "$20" }];
+const dateLabel = (value: string, locale: "en" | "ar") => new Date(value).toLocaleString(locale === "ar" ? "ar-EG" : "en-US", { dateStyle: "medium", timeStyle: "short" });
+export default function CreditsPage() {
+  const { wallet, purchase } = useCredits(); const {locale,t}=useLocale(); const [receipt, setReceipt] = useState("");
+  return <><div className="page-heading"><div><p className="eyebrow">{t("TRANSPARENT AI USAGE")}</p><h1 className="h1">{t("Credits & usage.")}</h1><p className="subhead">{t("A clear balance, predictable action costs, and a local demo wallet.")}</p></div><span className="status">{t("DEMO WALLET · NO BILLING")}</span></div>
+    <div className="grid grid-2"><section className="panel wallet-hero"><div className="metric-icon"><Coins size={19}/></div><p className="eyebrow" style={{marginTop:18}}>{t("AVAILABLE BALANCE")}</p><div className="wallet-balance">{wallet.balance}<span> {t("credits")}</span></div><p className="activity-detail">120 welcome credits · {wallet.purchased} demo purchased · {wallet.spent} used</p><div className="wallet-equivalent">About {Math.floor(wallet.balance / CREDIT_COSTS.application)} application preparations at current rates.</div></section><section className="panel"><h2 className="section-title">{t("Action costs")}</h2><p className="activity-detail" style={{marginTop:5}}>{t("You’ll always see the cost before an action runs.")}</p><div className="cost-list">{(Object.keys(CREDIT_COSTS) as CreditAction[]).map(action=><div key={action} className="cost-row"><span>{t(CREDIT_LABELS[action])}</span><strong>{CREDIT_COSTS[action]} credits</strong></div>)}</div></section></div>
+    <section className="section-head"><h2 className="section-title">{t("Demo credit packages")}</h2><span className="demo-label">{t("SIMULATED CHECKOUT")}</span></section><p className="activity-detail" style={{marginTop:-8,marginBottom:14}}>{t("Purchases update this browser’s demo wallet; no payment is processed.")}</p>{receipt&&<div className="status ready_for_review" style={{marginBottom:12}}>{receipt}</div>}<div className="grid grid-4">{packages.map(p=><article className="panel package-card" key={p.name}><div className="metric-icon"><CreditCard size={16}/></div><h3>{p.name}</h3><div className="package-credits">{p.credits}<span> credits</span></div><div className="activity-detail">{p.price} · {t("illustrative price")}</div><button className="btn primary small" style={{marginTop:16,width:"100%"}} onClick={()=>{purchase(p.credits,p.name);setReceipt(`${p.name} package added: ${p.credits} demo credits.`)}}>{t("Add demo credits")} <ArrowRight size={13}/></button></article>)}</div>
+    <section className="section-head"><h2 className="section-title">{t("Wallet history")}</h2></section><section className="panel">{wallet.transactions.length?wallet.transactions.map(tx=><div className="credit-transaction" key={tx.id}><span className="transaction-icon"><History size={14}/></span><div style={{flex:1}}><strong>{t(tx.description)}</strong><div className="activity-detail">{dateLabel(tx.createdAt,locale)}{tx.action?` · ${CREDIT_LABELS[tx.action]}`:""}</div></div><strong className={tx.amount>0?"credit-positive":"credit-negative"}>{tx.amount>0?`+${tx.amount}`:tx.amount} <small>credits</small></strong><span className="activity-detail">{tx.balanceAfter} left</span></div>):<div className="empty-state career-empty-state"><CareerEmptyIllustration kind="path"/><strong>{t("No activity yet.")}</strong><p>{t("Your wallet history will appear as you use demo credits.")}</p></div>}</section>
+    <p className="activity-detail" style={{marginTop:13}}>A real billing provider, server-side ledger, and Supabase synchronization will be connected for production. <Link href="/settings" className="text-link">{t("Integration settings")}</Link></p>
+  </>;
+}
+
+

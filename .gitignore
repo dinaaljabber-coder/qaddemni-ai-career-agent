@@ -1,0 +1,21 @@
+node_modules/
+.pnpm-store/
+.next/
+/out/
+/build/
+/dist/
+coverage/
+
+# Secrets and local overrides. Keep the safe, blank template shareable.
+.env
+.env.*
+!.env.example
+*.local
+
+# Machine/editor artifacts
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+.idea/
+.vercel/
+.netlify/
